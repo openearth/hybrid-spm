@@ -70,4 +70,4 @@ for time in np.arange(0,365,14):
     print(str(ds.time.values[time])[:10])
     
 #%%Statistics==========================================================
-#Remove nans
+
