@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 plt.close('all')
 from dfm_tools.get_nc import get_netdata, get_ncmodeldata, plot_netmapdata
 from dfm_tools.get_nc_helpers import get_ncvardimlist, get_timesfromnc, get_hisstationlist, get_ncvarproperties
-
+import seaborn as sns
 #Savepath
 savepath=r'p:/11206887-012-sito-is-2021-so-et-es/Analysis/'
 
@@ -32,8 +32,12 @@ fig, ax = plt.subplots()
 pc = plot_netmapdata(ugrid_all.verts, values=None, ax=None, linewidth=0.5, color="crimson", facecolor="None")
 ax.set_aspect('equal')
 
+#resolution for interpolation
+delta_x_n=(max(ugrid_all.mesh2d_node_x)-min(ugrid_all.mesh2d_node_x))*1111*np.cos(np.mean(ugrid_all.mesh2d_node_y)*np.pi/180)
+delta_y_n=(max(ugrid_all.mesh2d_node_y)-min(ugrid_all.mesh2d_node_y))*1111
+
 #plot raw model TIM (SPM) on map
-data_frommap_SPM = get_ncmodeldata(file_nc=fname, varname='mesh2d_water_quality_output_9', timestep=-1, layer=-1, multipart=True)
+data_frommap_SPM = get_ncmodeldata(file_nc=fname, varname='mesh2d_water_quality_output_9', timestep=-1, layer=-1, multipart=True).mean()
 
 matplotlib.rcParams['figure.figsize'] = (20,10)
 fig, ax = plt.subplots()
@@ -70,4 +74,17 @@ for time in np.arange(0,365,14):
     print(str(ds.time.values[time])[:10])
     
 #%%Statistics==========================================================
+#Variables
+SPM=ds.mesh2d_water_quality_output_9
 
+#histpolt
+xr.plot.hist(SPM)
+#min-max
+print('min: '+ str(SPM.min()))
+print('max: '+ str(SPM.max()))
+
+#Clean outliers
+SPM_pos = SPM.where(SPM > 0)
+ds['mesh2d_water_quality_output_9'] = SPM_pos
+
+SPM_check=ds.mesh2d_water_quality_output_9.isel(layer=-1, time = -1)
