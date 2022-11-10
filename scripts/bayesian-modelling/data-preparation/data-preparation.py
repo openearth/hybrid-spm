@@ -13,7 +13,7 @@ cms = xr.open_dataset(
 dfm = xr.open_dataset(
     r"P:\11206887-012-sito-is-2021-so-et-es\Data\DFM_DWSM-FM_100m\Postprocessing_maps\DWSM-FM_100m_0000_map_regular_500_400_allvars.nc")
 
-dfmspm = dfm.sel(layer=-0.05).mesh2d_water_quality_output_9
+dfmspm = dfm.drop(['layer']).mesh2d_water_quality_output_9
 cms = cms.where(((cms.time >= dfmspm.time.min()) & (cms.time <= dfmspm.time.max())), drop=True)
 
 cms_newgrid = cms.interp(lat = dfmspm.lat, lon = dfmspm.lon)
