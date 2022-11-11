@@ -14,8 +14,20 @@ plt.close('all')
 from dfm_tools.get_nc import get_netdata, get_ncmodeldata, plot_netmapdata
 from dfm_tools.get_nc_helpers import get_ncvardimlist, get_timesfromnc, get_hisstationlist, get_ncvarproperties
 import seaborn as sns
+import glob
 #Savepath
 savepath=r'p:/11206887-012-sito-is-2021-so-et-es/Analysis/'
+
+#%%Combine monthly DFM files
+#Merge monthly files
+subdir = os.path.abspath(r'p:\11206887-012-sito-is-2021-so-et-es\Scripts\DFM_postprocess\data\output')
+fn_monthly=glob.glob(os.path.join(subdir, '*.nc'))
+DFM_combined = xr.open_mfdataset(fn_monthly, combine = 'nested', concat_dim=["time"])
+DFM_combined = xr.merge(fn_monthly)
+
+#Savefile
+DFM_combined.to_netcdf(r'p:\11206887-012-sito-is-2021-so-et-es\Scripts\DFM_postprocess\data\output\DWSM-FM_100m_0000_map_regular_2367_1583_TIM.nc')
+print('Yearly datasets saved')
 
 #%%INTERPOLATION CHECK=========================================================
 #Visualise unstructured data using dfm_tools
