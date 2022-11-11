@@ -55,8 +55,8 @@ ax.set_aspect('equal')
 nc_path = os.path.abspath(r'p:\11206887-012-sito-is-2021-so-et-es\Scripts\DFM_postprocess\data\output\DWSM-FM_100m_0000_map_regular_2367_1583_TIM.nc')
 
 ds = xr.open_dataset(nc_path)
+ds=ds.sortby('time')
 #Postprocess time
-model_interp_time=ds.time.values
 matplotlib.rcParams['figure.figsize'] = (20,10)
 ds.mesh2d_water_quality_output_9.isel(layer=-1, time=-1).plot(cmap="jet", robust=True)
 
@@ -67,13 +67,13 @@ for time in np.arange(0,365,14):
     matplotlib.rcParams['figure.figsize'] = (20,10)
     fig, ax = plt.subplots(2)
     pc = plot_netmapdata(ugrid_all.verts, values=data_frommap_SPM[0,:], ax=ax[0], linewidth=0.5, cmap="jet")
-    # pc.set_clim([0,100])
+    pc.set_clim([0,100])
     fig.colorbar(pc, ax=ax[0])
     ax[0].set_xlim(min(ugrid_all.mesh2d_node_x),max(ugrid_all.mesh2d_node_x))
     ax[0].set_ylim(min(ugrid_all.mesh2d_node_y),max(ugrid_all.mesh2d_node_y))
     ax[0].set_title('Raw model output')
     #ax.set_title('%s (%s)'%(data_frommap_SPM.var_varname, data_frommap_SPM.var_ncattrs['units']))
-    ds.mesh2d_water_quality_output_9.isel(layer=-1, time=time).plot(cmap="jet", robust=True, ax=ax[1])
+    ds.mesh2d_water_quality_output_9.isel(layer=-1, time=time).plot(cmap="jet", robust=True, ax=ax[1], vmin=0, vmax=100)
     fig.savefig(savepath + 'Plots/DFM/Interp_check/DFM_raw_vs_DFM_interp' + '_' + str(ds.time.values[time])[:10] + '.png', format='png', bbox_inches='tight', dpi=300)
     print(str(ds.time.values[time])[:10])
     
