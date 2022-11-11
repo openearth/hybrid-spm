@@ -38,7 +38,8 @@ delta_x_n=(max(ugrid_all.mesh2d_node_x)-min(ugrid_all.mesh2d_node_x))*1111*np.co
 delta_y_n=(max(ugrid_all.mesh2d_node_y)-min(ugrid_all.mesh2d_node_y))*1111
 
 #plot raw model TIM (SPM) on map
-data_frommap_SPM = get_ncmodeldata(file_nc=fname, varname='mesh2d_water_quality_output_9', timestep=-1, layer=-1, multipart=True).mean()
+model_time=get_timesfromnc(file_nc=fname, varname="time")
+data_frommap_SPM = get_ncmodeldata(file_nc=fname, varname='mesh2d_water_quality_output_9', timestep=-1, layer=-1, multipart=True)
 
 matplotlib.rcParams['figure.figsize'] = (20,10)
 fig, ax = plt.subplots()
@@ -51,9 +52,11 @@ ax.set_aspect('equal')
 #Visualise structured data
 
 #Data source: Processed DFM output (100mx100m)
-nc_path = os.path.abspath(r'p:\11206887-012-sito-is-2021-so-et-es\Data\DFM_DWSM-FM_100m\Postprocessing_maps\DWSM-FM_100m_0000_map_regular_500_400_SPM.nc')
+nc_path = os.path.abspath(r'p:\11206887-012-sito-is-2021-so-et-es\Scripts\DFM_postprocess\data\output\DWSM-FM_100m_0000_map_regular_2367_1583_TIM.nc')
 
 ds = xr.open_dataset(nc_path)
+#Postprocess time
+model_interp_time=ds.time.values
 matplotlib.rcParams['figure.figsize'] = (20,10)
 ds.mesh2d_water_quality_output_9.isel(layer=-1, time=-1).plot(cmap="jet", robust=True)
 
