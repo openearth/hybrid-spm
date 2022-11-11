@@ -14,6 +14,7 @@ plt.close('all')
 from dfm_tools.get_nc import get_netdata, get_ncmodeldata, plot_netmapdata
 from dfm_tools.get_nc_helpers import get_ncvardimlist, get_timesfromnc, get_hisstationlist, get_ncvarproperties
 import seaborn as sns
+import glob
 #Savepath
 savepath=r'p:/11206887-012-sito-is-2021-so-et-es/Analysis/'
 
@@ -37,7 +38,8 @@ delta_x_n=(max(ugrid_all.mesh2d_node_x)-min(ugrid_all.mesh2d_node_x))*1111*np.co
 delta_y_n=(max(ugrid_all.mesh2d_node_y)-min(ugrid_all.mesh2d_node_y))*1111
 
 #plot raw model TIM (SPM) on map
-data_frommap_SPM = get_ncmodeldata(file_nc=fname, varname='mesh2d_water_quality_output_9', timestep=-1, layer=-1, multipart=True).mean()
+model_time=get_timesfromnc(file_nc=fname, varname="time")
+data_frommap_SPM = get_ncmodeldata(file_nc=fname, varname='mesh2d_water_quality_output_9', timestep=-1, layer=-1, multipart=True)
 
 matplotlib.rcParams['figure.figsize'] = (20,10)
 fig, ax = plt.subplots()
@@ -50,9 +52,11 @@ ax.set_aspect('equal')
 #Visualise structured data
 
 #Data source: Processed DFM output (100mx100m)
-nc_path = os.path.abspath(r'p:\11206887-012-sito-is-2021-so-et-es\Data\DFM_DWSM-FM_100m\Postprocessing_maps\DWSM-FM_100m_0000_map_regular_500_400_SPM.nc')
+nc_path = os.path.abspath(r'p:\11206887-012-sito-is-2021-so-et-es\Scripts\DFM_postprocess\data\output\DWSM-FM_100m_0000_map_regular_2367_1583_TIM.nc')
 
 ds = xr.open_dataset(nc_path)
+ds=ds.sortby('time')
+#Postprocess time
 matplotlib.rcParams['figure.figsize'] = (20,10)
 ds.mesh2d_water_quality_output_9.isel(layer=-1, time=-1).plot(cmap="jet", robust=True)
 
@@ -63,13 +67,13 @@ for time in np.arange(0,365,14):
     matplotlib.rcParams['figure.figsize'] = (20,10)
     fig, ax = plt.subplots(2)
     pc = plot_netmapdata(ugrid_all.verts, values=data_frommap_SPM[0,:], ax=ax[0], linewidth=0.5, cmap="jet")
-    # pc.set_clim([0,100])
+    pc.set_clim([0,100])
     fig.colorbar(pc, ax=ax[0])
     ax[0].set_xlim(min(ugrid_all.mesh2d_node_x),max(ugrid_all.mesh2d_node_x))
     ax[0].set_ylim(min(ugrid_all.mesh2d_node_y),max(ugrid_all.mesh2d_node_y))
     ax[0].set_title('Raw model output')
     #ax.set_title('%s (%s)'%(data_frommap_SPM.var_varname, data_frommap_SPM.var_ncattrs['units']))
-    ds.mesh2d_water_quality_output_9.isel(layer=-1, time=time).plot(cmap="jet", robust=True, ax=ax[1])
+    ds.mesh2d_water_quality_output_9.isel(layer=-1, time=time).plot(cmap="jet", robust=True, ax=ax[1], vmin=0, vmax=100)
     fig.savefig(savepath + 'Plots/DFM/Interp_check/DFM_raw_vs_DFM_interp' + '_' + str(ds.time.values[time])[:10] + '.png', format='png', bbox_inches='tight', dpi=300)
     print(str(ds.time.values[time])[:10])
     
