@@ -47,14 +47,19 @@ mwtl = pd.concat(mwtl)
 dfmspm = dfm.isel(time=0,layer=0).drop(['time','layer'])
 #dfmspm = dfm.drop(['layer']).mesh2d_water_quality_output_9
 
-# cutting to only 2017 
-cms_cut   = cms.sel(time=cms.time.dt.year == 2017)
+# cutting to only 2017 # cutting out januari as well as it has a lot of nan data 
+cms_cut   = cms.sel(time=slice('2017-02-01','2017-12-31'))
 
-#some tests #TODO for next time take out first part of the 2017 data as they contain a lot of nans. Investigate and then interpolate over another month (March or so) 
-cms1=cms_cut.isel(time=1)
+#some tests on slice of the data. can be done on all when this works. 
+cms1=cms_cut.sel(time=slice('2017-3-01','2017-4-01'))
 
-#interpolating satellite data onto the model data
-cms_newgrid1 = cms1.interp(lat = dfmspm.lat, lon = dfmspm.lon)
+#interpolating satellite data onto the model data, specifying the type of method
+cms_newgrid = cms1.interp(lat = dfmspm.lat, lon = dfmspm.lon, method='nearest')
+
+#plotting
+#cms_newgrid.isel(time=5).SPM.plot(vmin=0, vmax=100)
+
+#when saving, add data encoding as explained in merge-cmems.py 
 
 #checking which mwtl data is taken as the same time as the satellite data. #TODO
 merge['time_diff'] = abs((merge.Date_time - merge.datetimeUTC).astype('timedelta64[m]')).values
