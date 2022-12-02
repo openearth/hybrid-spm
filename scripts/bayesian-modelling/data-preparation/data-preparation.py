@@ -44,7 +44,7 @@ for fname in os.listdir(mwtl_dir):
     station=list(mwtl_loc.loc[mwtl_loc['locatie.code'] == name, 'locatie.code'])
     coords=mwtl_loc.loc[mwtl_loc['locatie.code'] == station[0]]
     spm=pd.read_csv(f)
-    spm=spm.rename(columns={name :'SPM'})
+    spm=spm.rename(columns={name :'mwtl_SPM'})
     spm['Time'] = pd.to_datetime(spm['Time'],format='%Y-%m-%d %H:%M:%S')
     spm['station'] = coords['locatie.code'].iloc[0]
     spm['lon'] = coords['lon'].iloc[0]
@@ -75,22 +75,38 @@ cms_newgrid = cms_cut.interp(lat = dfmspm.lat, lon = dfmspm.lon, method='nearest
 # [cms.lon.encoding.pop(b) for b in ['szip', 'zstd', 'bzip2', 'blosc']]
 # [cms.lat.encoding.pop(b) for b in ['szip', 'zstd', 'bzip2', 'blosc']]
 # [cms.time.encoding.pop(b) for b in ['szip', 'zstd', 'bzip2', 'blosc']]
-cms_newgrid.to_netcdf(
-    opath, 
+#cms_newgrid.to_netcdf(
+#    opath, 
     # encoding={
     #     'lat': cms.lat.encoding, 'lon': cms.lon.encoding, 
     #     'time': cms.time.encoding, 'SPM': cms.SPM.encoding
     #     }
-    )
+#    )
 
 
 #checking which mwtl data is taken as the same time as the satellite data. #TODO
 mwtl = mwtl[mwtl['Time'].dt.year == 2017]
 mwtl=mwtl[mwtl['Time'].dt.hour.between(9,12)]
 mwtl = mwtl.sort_values(by='Time', ascending=True)
-mwtl_date=mwtl['Time'].dt.date
+#mwtl_date=mwtl['Time'].dt.date
 
-for i in range(len(mwtl['Time'].to_numpy())):
-    cms.sel(time=mwtl_date.iloc[i],lat=mwtl['lat'].iloc[i],lon=mwtl['lon'].iloc[i],method='nearest')
+def satspm(ee):
+
+    time = ee.Time
+    lat = ee.lat
+    lon = ee.lon
+    spm = cms.sel(time=time, lat=lat, lon=lon,method='nearest').SPM.values
+   
+    ee['sat_SPM'] = spm
+    ee['sat_time'] = cms.sel(time=time, lat=lat, lon=lon,method='nearest').time.values
+    
+    return ee
+
+
+dd = mwtl.apply(satspm,axis=1)
+
+
+#for i in range(len(mwtl['Time'].to_numpy())):
+#    cms.sel(time=mwtl['Time'].iloc[i],lat=mwtl['lat'].iloc[i],lon=mwtl['lon'].iloc[i],method='nearest')
 
 #merge['time_diff'] = abs((merge.Date_time - merge.datetimeUTC).astype('timedelta64[m]')).values
