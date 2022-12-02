@@ -24,17 +24,19 @@ if platform == 'linux':
     dfm = xr.open_dataset(
         r"/p/11206887-012-sito-is-2021-so-et-es/Data/DFM_DWSM-FM_100m/Postprocessing_maps/DWSM-FM_100m_0000_map_regular_500_400_allvars.nc")
     opath = r"/p/11206887-012-sito-is-2021-so-et-es/Data/interpolated_CMS/CMS_interpolated_to_DFMgrid.nc"
+    mwtl_loc=pd.read_csv(r'/p/11206887-012-sito-is-2021-so-et-es/Data/MWTL/MWTL_stations_all.csv')
+    mwtl_dir=r'/p/11206887-012-sito-is-2021-so-et-es/Data/MWTL/csv_per_station'
 else:
     cms = xr.open_dataset(
         r"p:\11206887-012-sito-is-2021-so-et-es\Data\CMEMS_Satellite_100mx100m\merged_2015-2020\2015_2020_P1D_HROC_L3-transp_NWS_31_32ULE_100m-v01.nc")
     dfm = xr.open_dataset(
         r"P:\11206887-012-sito-is-2021-so-et-es\Data\DFM_DWSM-FM_100m\Postprocessing_maps\DWSM-FM_100m_0000_map_regular_500_400_allvars.nc")
     opath = r"P:\11206887-012-sito-is-2021-so-et-es\Data\interpolated_CMS\CMS_interpolated_to_DFMgrid.nc"
+    mwtl_loc=pd.read_csv(r'P:\11206887-012-sito-is-2021-so-et-es\Data\MWTL\MWTL_stations_all.csv')
+    mwtl_dir=r'P:\11206887-012-sito-is-2021-so-et-es\Data\MWTL\csv_per_station'
+
 
 #combining mwtl locations and mwtl SPM to one tabel
-mwtl_loc=pd.read_csv(r'P:\11206887-012-sito-is-2021-so-et-es\Data\MWTL\MWTL_stations_all.csv')
-mwtl_dir=r'P:\11206887-012-sito-is-2021-so-et-es\Data\MWTL\csv_per_station'
-
 mwtl_loc=mwtl_loc.rename(columns={'geometriepunt.x':'lon', 'geometriepunt.y':'lat'})
 mwtl=[]
 
@@ -133,7 +135,7 @@ tt=tt[~tt.mwtl_SPM.isna()]
 df = tt.apply(dfmspm_func,axis=1)
 df.reset_index(drop=True,inplace=True)
 
-df.to_csv(r'P:\11206887-012-sito-is-2021-so-et-es\Data\input_bayesian\input_bayesian_mwtl_dfm_cms.csv')
+#df.to_csv(r'P:\11206887-012-sito-is-2021-so-et-es\Data\input_bayesian\input_bayesian_mwtl_dfm_cms.csv')
 
 
 #merge['time_diff'] = abs((merge.Date_time - merge.datetimeUTC).astype('timedelta64[m]')).values
