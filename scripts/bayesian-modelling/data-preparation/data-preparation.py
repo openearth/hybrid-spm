@@ -72,9 +72,9 @@ cms_newgrid = cms_cut.interp(lat = dfmspm.lat, lon = dfmspm.lon, method='nearest
 #saving
 #when saving, add data encoding as explained in merge-cmems.py 
 #[cms.SPM.encoding.pop(b) for b in ['szip', 'zstd', 'bzip2', 'blosc']]
-[cms.lon.encoding.pop(b) for b in ['szip', 'zstd', 'bzip2', 'blosc']]
-[cms.lat.encoding.pop(b) for b in ['szip', 'zstd', 'bzip2', 'blosc']]
-[cms.time.encoding.pop(b) for b in ['szip', 'zstd', 'bzip2', 'blosc']]
+# [cms.lon.encoding.pop(b) for b in ['szip', 'zstd', 'bzip2', 'blosc']]
+# [cms.lat.encoding.pop(b) for b in ['szip', 'zstd', 'bzip2', 'blosc']]
+# [cms.time.encoding.pop(b) for b in ['szip', 'zstd', 'bzip2', 'blosc']]
 cms_newgrid.to_netcdf(
     opath, 
     # encoding={
@@ -85,7 +85,7 @@ cms_newgrid.to_netcdf(
 
 
 #checking which mwtl data is taken as the same time as the satellite data. #TODO
-cms_time=cms_cut.time.to_dataframe()
-mwtl[mwtl['Time']]
-new_date = mwtl['Time'].replace(minute=0, second=0, microsecond=0) + datetime.timedelta(hours=1)
+mwtl = mwtl[mwtl['Time'].dt.year == 2017]
+mwtl=mwtl[mwtl['Time'].dt.hour.between(9,12)]
+
 #merge['time_diff'] = abs((merge.Date_time - merge.datetimeUTC).astype('timedelta64[m]')).values
