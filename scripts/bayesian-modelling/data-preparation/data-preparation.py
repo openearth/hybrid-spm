@@ -87,5 +87,10 @@ cms_newgrid.to_netcdf(
 #checking which mwtl data is taken as the same time as the satellite data. #TODO
 mwtl = mwtl[mwtl['Time'].dt.year == 2017]
 mwtl=mwtl[mwtl['Time'].dt.hour.between(9,12)]
+mwtl = mwtl.sort_values(by='Time', ascending=True)
+mwtl_date=mwtl['Time'].dt.date
+
+for i in range(len(mwtl['Time'].to_numpy())):
+    cms.sel(time=mwtl_date.iloc[i],lat=mwtl['lat'].iloc[i],lon=mwtl['lon'].iloc[i],method='nearest')
 
 #merge['time_diff'] = abs((merge.Date_time - merge.datetimeUTC).astype('timedelta64[m]')).values
