@@ -99,7 +99,9 @@ def satspm(ee):
    
     ee['sat_SPM'] = spm
     ee['sat_time'] = cms.sel(time=time, lat=lat, lon=lon,method='nearest').time.values
-    
+    ee['sat_lon'] = cms.sel(time=time, lat=lat, lon=lon,method='nearest').lon.values
+    ee['sat_lat'] = cms.sel(time=time, lat=lat, lon=lon,method='nearest').lat.values
+
     return ee
 
 
