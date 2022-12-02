@@ -86,29 +86,31 @@ cms_newgrid = cms_cut.interp(lat = dfmspm.lat, lon = dfmspm.lon, method='nearest
 
 #checking which mwtl data is taken as the same time as the satellite data. #TODO
 mwtl = mwtl[mwtl['Time'].dt.year == 2017]
-mwtl=mwtl[mwtl['Time'].dt.hour.between(9,12)]
+#mwtl=mwtl[mwtl['Time'].dt.hour.between(9,12)]
 mwtl = mwtl.sort_values(by='Time', ascending=True)
 #mwtl_date=mwtl['Time'].dt.date
 
 def satspm(ee):
-
+    mth = pd.Series(ee.Time).dt.month.values[0]
     time = ee.Time
     lat = ee.lat
     lon = ee.lon
-    spm = cms.sel(time=time, lat=lat, lon=lon,method='nearest').SPM.values
+    varspm = cms_newgrid.sel(time = cms_newgrid.time.dt.month == mth).mean(dim='time')
+
+    spm = varspm.sel(lat=lat, lon=lon,method='nearest').SPM.values.flatten()[0]
    
     ee['sat_SPM'] = spm
-    ee['sat_time'] = cms.sel(time=time, lat=lat, lon=lon,method='nearest').time.values
-    ee['sat_lon'] = cms.sel(time=time, lat=lat, lon=lon,method='nearest').lon.values
-    ee['sat_lat'] = cms.sel(time=time, lat=lat, lon=lon,method='nearest').lat.values
+   # ee['sat_time'] = cms.sel(time=time, lat=lat, lon=lon,method='nearest').time.values
+   # ee['sat_lon'] = cms.sel(time=time, lat=lat, lon=lon,method='nearest').lon.values
+    #ee['sat_lat'] = cms.sel(time=time, lat=lat, lon=lon,method='nearest').lat.values
 
     return ee
 
 
 dd = mwtl.apply(satspm,axis=1)
 
-
-#for i in range(len(mwtl['Time'].to_numpy())):
-#    cms.sel(time=mwtl['Time'].iloc[i],lat=mwtl['lat'].iloc[i],lon=mwtl['lon'].iloc[i],method='nearest')
+for m in range(1,13):
+    cms_m = cms_newgrid.sel(time=cms_newgrid.time.dt.month == m).mean(dim='time')
+   
 
 #merge['time_diff'] = abs((merge.Date_time - merge.datetimeUTC).astype('timedelta64[m]')).values
