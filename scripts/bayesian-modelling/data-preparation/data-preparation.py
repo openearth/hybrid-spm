@@ -69,7 +69,7 @@ cms_newgrid = cms_cut.interp(lat = dfmspm.lat, lon = dfmspm.lon, method='nearest
 #plotting an example of the interpolated gridconda 
 #cms_newgrid.isel(time=5).SPM.plot(vmin=0, vmax=100)
 
-#saving
+#saving data
 #when saving, add data encoding as explained in merge-cmems.py 
 #[cms.SPM.encoding.pop(b) for b in ['szip', 'zstd', 'bzip2', 'blosc']]
 # [cms.lon.encoding.pop(b) for b in ['szip', 'zstd', 'bzip2', 'blosc']]
@@ -106,11 +106,34 @@ def satspm(ee):
 
     return ee
 
+def dfmspm_func(ee):
+    time = ee.Time
+    lat = ee.lat
+    lon = ee.lon
 
-dd = mwtl.apply(satspm,axis=1)
+    spm = dfmt.sel(time=time, lat=lat, lon=lon,method='nearest').mesh2d_water_quality_output_9.values.flatten()[0]
+   
+    ee['dfm_SPM'] = spm
+   # ee['sat_time'] = cms.sel(time=time, lat=lat, lon=lon,method='nearest').time.values
+   # ee['sat_lon'] = cms.sel(time=time, lat=lat, lon=lon,method='nearest').lon.values
+    #ee['sat_lat'] = cms.sel(time=time, lat=lat, lon=lon,method='nearest').lat.values
 
+    return ee
+
+#create monthly aggregated
 for m in range(1,13):
     cms_m = cms_newgrid.sel(time=cms_newgrid.time.dt.month == m).mean(dim='time')
    
+dfmt = dfm.isel(layer=0).drop(['layer'])
+
+dd = mwtl.apply(satspm,axis=1)
+tt = dd[~dd.sat_SPM.isna()]
+tt=tt[~tt.mwtl_SPM.isna()]
+
+df = tt.apply(dfmspm_func,axis=1)
+df.reset_index(drop=True,inplace=True)
+
+df.to_csv(r'P:\11206887-012-sito-is-2021-so-et-es\Data\input_bayesian\input_bayesian_mwtl_dfm_cms.csv')
+
 
 #merge['time_diff'] = abs((merge.Date_time - merge.datetimeUTC).astype('timedelta64[m]')).values
