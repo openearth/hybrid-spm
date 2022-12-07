@@ -18,16 +18,17 @@ library('tidyverse')
 # input is space -> gridcel number for example
 # time
 # coordinates
-d <- read_delim(file = "P://11206887-012-sito-is-2021-so-et-es/Data/input_bayesian/input_bayesian_mwtl_dfm_cms.csv")
+d <- read_delim(file = "P://11206887-012-sito-is-2021-so-et-es/Data/input_bayesian/input_bayesian_mwtl_dfm_cms_finemodelgrid_restructured.csv")
 #f2 <- y8hrmax ~ xmaxtemp+xwdsp+xrh
-d[1] <- NULL
-data <-d
-head(data)
+
 f <- mwtl_SPM ~ sat_SPM + dfm_SPM
 
 #Bsptime running 3.2, 3.4 -> example
-M3 <- Bsptime(package="spTimer", formula=f, data=data, n.report=5, time.data=1,
-              coordtype="lonlat", coords=5:6)
+M1 <- Bsptime(model="lm", formula=f, data=d, scale.transform = "SQRT")
+a <- residuals(M1)
+
+M2 <- Bsptime(package="separable", formula=f, data=d, scale.transform="SQRT",
+              coordtype="utm", coords=2:3)
 Bsptime()
 #selecting validation points
 
