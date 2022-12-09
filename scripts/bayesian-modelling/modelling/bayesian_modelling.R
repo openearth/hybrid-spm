@@ -20,15 +20,22 @@ library('tidyverse')
 # coordinates
 d <- read_delim(file = "P://11206887-012-sito-is-2021-so-et-es/Data/input_bayesian/input_bayesian_mwtl_dfm_cms_finemodelgrid_restructured.csv")
 #f2 <- y8hrmax ~ xmaxtemp+xwdsp+xrh
+df <- read_delim(file = "P://11206887-012-sito-is-2021-so-et-es/Data/input_bayesian/input_restructured.csv")
 
+dt <- read_delim(file = "P://11206887-012-sito-is-2021-so-et-es/Data/input_bayesian/input_restructured_space_time.csv")
+
+dummy <-read_delim(file = "P://11206887-012-sito-is-2021-so-et-es/Data/input_bayesian/input_restructured_dummy.csv")
 f <- mwtl_SPM ~ sat_SPM + dfm_SPM
 
 #Bsptime running 3.2, 3.4 -> example
-M1 <- Bsptime(model="lm", formula=f, data=d, scale.transform = "SQRT")
+M1 <- Bsptime(model="lm", formula=f, data=dummy, scale.transform = "SQRT")
 a <- residuals(M1)
 
-M2 <- Bsptime(package="separable", formula=f, data=d, scale.transform="SQRT",
+M2 <- Bsptime(package="separable", formula=f, data=dummy, scale.transform="SQRT",
               coordtype="utm", coords=2:3)
+
+M3 <- Bsptime(package="spBayes", formula=f, data=dummy, coords=2:3, scale.transform="SQRT",
+              coordtype="utm",n.reports=5)
 Bsptime()
 #selecting validation points
 
