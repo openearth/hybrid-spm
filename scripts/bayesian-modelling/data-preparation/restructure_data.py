@@ -29,23 +29,11 @@ df['UTMx']=pd.Series(UTM[0])
 df['UTMy']=pd.Series(UTM[1])
 
 start=pd.to_datetime('2017-01-01')
-end=pd.to_datetime('2017-01-31')
+end=pd.to_datetime('2017-12-31')
 
 df['year'] = pd.to_datetime(df['Time']).dt.year
 df['month'] = pd.to_datetime(df['Time']).dt.month
 df['day'] = pd.to_datetime(df['Time']).dt.day
-
-
-cols=['s.index', 'UTMx', 'UTMy','lon', 'lat','year', 'month','day' , 'sat_SPM', 'dfm_SPM', 'mwtl_SPM']
-df=df.drop(columns=['Unnamed: 0', 'station'])
-s1= df.loc[df['s.index'] == 1]
-
-"""
-df['year'] = pd.to_datetime(df['Time']).dt.year
-df['month'] = pd.to_datetime(df['Time']).dt.month
-df['day'] = pd.to_datetime(df['Time']).dt.day
-"""
-s1 = s1[cols]
 
 #df=df.drop(columns=['Time'])
 dti=pd.DataFrame()
@@ -54,27 +42,65 @@ dti['time'] = pd.date_range(start, end, freq="D")
 dti['time'] = dti['time'].dt.date
 df['time'] = df['Time'].dt.date
 
+s1= df.loc[df['s.index'] == 1]
+s2= df.loc[df['s.index'] == 2]
+
+df=df.sort_values(['s.index', 'time'], ascending=[True, True])
+df=df.drop(columns=['time'])
+
+cols=['s.index', 'UTMx', 'UTMy' ,'lon', 'lat', 'sat_SPM', 'dfm_SPM', 'mwtl_SPM']
+df=df[cols]
+df.to_csv(r'P:\11206887-012-sito-is-2021-so-et-es\Data\input_bayesian\input_bayesian.csv', index=False)
+# %%
+d=pd.merge(df,dti,on='time',how='outer')
+# %% prepping input data
+d=d.sort_values(by='Time')
+cols=['Time', 's.index', 'UTMx', 'UTMy' ,'lon', 'lat','time','year', 'month','day', 'sat_SPM', 'dfm_SPM', 'mwtl_SPM']
+d['year'] = pd.to_datetime(d['time']).dt.year
+d['month'] = pd.to_datetime(d['time']).dt.month
+d['day'] = pd.to_datetime(d['time']).dt.day
+
+
+d = d[cols]
+d.to_csv(r'P:\11206887-012-sito-is-2021-so-et-es\Data\input_bayesian\input_restructuredAll.csv', index=False)
+
+ #%% DOWN BELOW IS TESTING STUFF
+"""
+df['year'] = pd.to_datetime(df['Time']).dt.year
+df['month'] = pd.to_datetime(df['Time']).dt.month
+df['day'] = pd.to_datetime(df['Time']).dt.day
+"""
+s1 = s1[cols]
+
+ds2=pd.DataFrame()
+df['Time']=pd.to_datetime(df['Time'])
+ds2['time'] = pd.date_range(start, end, freq="D")
+ds2['time'] = ds2['time'].dt.date
+
 dti['lon']=s1['lon'][0]
 dti['lat']=s1['lat'][0]
 dti['s.index']=s1['s.index'][0]
+dti['UTMx']=s1['UTMx'][0]
+dti['UTMy']=s1['UTMy'][0]
+
 dti['sat_SPM']=np.random.randint(1, 6, dti.shape[0])
 dti['dfm_SPM']=np.random.randint(1, 6, dti.shape[0])
 dti['mwtl_SPM']=np.random.randint(1, 6, dti.shape[0])
-dti['UTMx']=df['UTMx'][0]
-dti['UTMy']=df['UTMy'][0]
 
 dti['year'] = pd.to_datetime(dti['time']).dt.year
 dti['month'] = pd.to_datetime(dti['time']).dt.month
 dti['day'] = pd.to_datetime(dti['time']).dt.day
 
+#dd=pd.concat([dti,ds2])
 
 dti=dti.sort_values(['s.index', 'time'], ascending=[True, True])
 dti=dti.drop(columns=['time'])
 
+cols=['s.index', 'UTMx', 'UTMy' ,'lon', 'lat', 'sat_SPM', 'dfm_SPM', 'mwtl_SPM']
 dti=dti[cols]
 dti.to_csv(r'P:\11206887-012-sito-is-2021-so-et-es\Data\input_bayesian\input_restructured_dummy.csv', index=False)
 
-# %%
+# %% TESTING STUFFF
 dti=pd.DataFrame()
 
 df['time'] = pd.to_datetime(df['Time'])
@@ -92,10 +118,10 @@ d['year'] = pd.to_datetime(d['Time']).dt.year
 d['month'] = pd.to_datetime(d['Time']).dt.month
 d['day'] = pd.to_datetime(d['Time']).dt.day
 
-d.sort_values(by='Time', inplace=True)
+d=d.sort_values(by='time')
 d=d.drop(columns=['Time'])
 
-cols=['s.index', 'UTMx', 'UTMy' ,'lon', 'lat','year', 'month','day', 'sat_SPM', 'dfm_SPM', 'mwtl_SPM']
+cols=['s.index', 'UTMx', 'UTMy' ,'lon', 'lat','year', 'month','day', 'sat_SPM', 'dfm_SPM', 'mwtl_SPM','time']
 
 d = d[cols]
 

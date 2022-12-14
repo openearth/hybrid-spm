@@ -12,17 +12,13 @@ library('tidyverse')
 
 
 #reading datasets 
-#
-
 # formula definition -> now taken from example
-# input is space -> gridcel number for example
-# time
-# coordinates
-d <- read_delim(file = "P://11206887-012-sito-is-2021-so-et-es/Data/input_bayesian/input_bayesian_mwtl_dfm_cms_finemodelgrid_restructured.csv")
-#f2 <- y8hrmax ~ xmaxtemp+xwdsp+xrh
-df <- read_delim(file = "P://11206887-012-sito-is-2021-so-et-es/Data/input_bayesian/input_restructured.csv")
+# input is space -> gridcel number for example, time, coordinates
+#d <- read_delim(file = "P://11206887-012-sito-is-2021-so-et-es/Data/input_bayesian/input_bayesian_mwtl_dfm_cms_finemodelgrid_restructured.csv")
 
-dt <- read_delim(file = "P://11206887-012-sito-is-2021-so-et-es/Data/input_bayesian/input_restructured_space_time.csv")
+#df <- read_delim(file = "P://11206887-012-sito-is-2021-so-et-es/Data/input_bayesian/input_restructured.csv")
+
+#dt <- read_delim(file = "P://11206887-012-sito-is-2021-so-et-es/Data/input_bayesian/input_restructured_space_time.csv")
 
 dummy <-read_delim(file = "P://11206887-012-sito-is-2021-so-et-es/Data/input_bayesian/input_restructured_dummy.csv")
 f <- mwtl_SPM ~ sat_SPM + dfm_SPM
@@ -31,12 +27,9 @@ f <- mwtl_SPM ~ sat_SPM + dfm_SPM
 M1 <- Bsptime(model="lm", formula=f, data=dummy, scale.transform = "SQRT")
 a <- residuals(M1)
 
-M2 <- Bsptime(package="separable", formula=f, data=dummy, scale.transform="SQRT",
-              coordtype="utm", coords=2:3)
-
-M3 <- Bsptime(package="spBayes", formula=f, data=dummy, coords=2:3, scale.transform="SQRT",
+M3 <- Bsptime(package="spTimer", formula=f, data=dummy, coords=2:3, scale.transform="SQRT",
               coordtype="utm",n.reports=5)
-Bsptime()
+
 #selecting validation points
 
 #exploring the separable model according to 3.3
