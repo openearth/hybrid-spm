@@ -2,6 +2,10 @@ library("bmstdr")
 library("ncdf4")
 library("spTimer")
 library('tidyverse')
+library('ggsn')
+library('ggmap')
+
+#map <- map_data("netherlands")
 # basic set up hybrid spm
 # input needed for Bsptime (package in bmstdr): 
 #   Data structure: 
@@ -27,13 +31,17 @@ f <- mwtl_SPM ~ sat_SPM + dfm_SPM
 M1 <- Bsptime(model="lm", formula=f, data=dummy, scale.transform = "SQRT")
 a <- residuals(M1)
 
-M3 <- Bsptime(package="spTimer", formula=f, data=dummy, coords=2:3, scale.transform="SQRT",
+M2 <- Bspatial(model="spat", formula=f, data=dummy, 
+               coordtype="lonlat", coords=4:5, phi=0.4)
+
+M3 <- Bsptime(package="spTimer", formula=f, data=dummy, coords=,c("UTMx","UTMy"), scale.transform="SQRT",
               coordtype="utm",n.reports=5)
 
 #selecting validation points
 
 #exploring the separable model according to 3.3
 
+fx<-nyspatial
 #plotting results /parameter estimations ect
 
 
