@@ -4,6 +4,8 @@ from pyproj import Proj
 from pyproj import CRS
 from pyproj import Transformer
 import numpy as np
+from datetime import datetime
+from matplotlib import pyplot as plt, dates as mdates
 
 df = pd.read_csv(r'P:\11206887-012-sito-is-2021-so-et-es\Data\input_bayesian\input_bayesian_mwtl_dfm_cms_finermodelgrid.csv')
 
@@ -44,13 +46,31 @@ df['time'] = df['Time'].dt.date
 
 s1= df.loc[df['s.index'] == 1]
 s2= df.loc[df['s.index'] == 2]
+s3= df.loc[df['s.index'] == 3]
 
 df=df.sort_values(['s.index', 'time'], ascending=[True, True])
-df=df.drop(columns=['time'])
+#df=df.drop(columns=['time'])
 
-cols=['s.index', 'UTMx', 'UTMy' ,'lon', 'lat', 'sat_SPM', 'dfm_SPM', 'mwtl_SPM']
+cols=['s.index', 'UTMx', 'UTMy' ,'lon', 'lat','time', 'year','month', 'day', 'sat_SPM', 'dfm_SPM', 'mwtl_SPM']
 df=df[cols]
-df.to_csv(r'P:\11206887-012-sito-is-2021-so-et-es\Data\input_bayesian\input_bayesian.csv', index=False)
+
+#df.to_csv(r'P:\11206887-012-sito-is-2021-so-et-es\Data\input_bayesian\input_bayesian.csv', index=False)
+
+# %%
+ax = plt.gca()
+plt.rcParams["figure.figsize"] = [12, 4]
+plt.rcParams["figure.autolayout"] = True
+ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
+ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
+ax.scatter(df['time'], df['mwtl_SPM'], label='MWTL')
+ax.scatter(df['time'], df['sat_SPM'], label='Satellite')
+ax.scatter(df['time'], df['dfm_SPM'], label='Model')
+ax.set_ylabel('SPM concentration')
+ax.set_xlabel('Time')
+
+plt.legend(loc="upper left")
+plt.title('SPM concentrations of MWTL, satellite and model at HUIBGOT, GROOTGND and ROTTMPT3')
+plt.show()
 # %%
 d=pd.merge(df,dti,on='time',how='outer')
 # %% prepping input data
