@@ -31,7 +31,7 @@ sorted_data <- train %>%
 subset<-head(train,20)
 M1 <- Bsptime(model="lm", formula=f, data=sorted_data, scale.transform = "SQRT")
 
-M2 <- Bspatial(model="separable", formula=f, data=sorted_data, 
+M2 <- Bspatial(model="spat", formula=f, data=sorted_data, 
              coordtype="lonlat", coords=4:5, phi=0.4)
 
 M3 <- Bsptime(package="separable", formula=f, data=sorted_data, coords=,c("UTMx","UTMy"), scale.transform="SQRT",
